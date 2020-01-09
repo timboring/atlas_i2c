@@ -41,11 +41,13 @@ class AtlasI2C:
     def open_file_streams(
         self, read_file: str = "/dev/i2c-{}", write_file: str = "/dev/i2c-{}"
     ) -> None:
+        # TODO: do we actually need two streams?
         self.file_read = io.open(file=read_file.format(self.bus), mode="rb", buffering=0)
         self.file_write = io.open(file=write_file.format(self.bus), mode="wb", buffering=0)
 
     def set_i2c_address(self, addr) -> None:
         """Set I2C communication."""
+        # TODO: what is this actually doing? and should I2C_SLAVE be hardcoded like this?
         I2C_SLAVE = 0x703
         fcntl.ioctl(self.file_read, I2C_SLAVE, addr)
         fcntl.ioctl(self.file_write, I2C_SLAVE, addr)
@@ -56,7 +58,7 @@ class AtlasI2C:
         cmd += "\00"
         self.file_write.write(cmd.encode("latin-1"))
 
-    def handle_raspi_glitch(self, response) -> List[str]:
+    def _handle_raspi_glitch(self, response) -> List[str]:
         """
         Change MSB to 0 for all received characters except the first
         and get a list of characters
@@ -94,7 +96,7 @@ class AtlasI2C:
         is_valid, error_code = self.response_valid(response=raw_data)
 
         if is_valid:
-            char_list: List[str] = self.handle_raspi_glitch(raw_data[1:])
+            char_list: List[str] = self._handle_raspi_glitch(raw_data[1:])
             # TODO: why build a string instead of just returning the actual data as a float?
             result = "Success " + self.get_device_info() + ": " + str("".join(char_list))
         else:
