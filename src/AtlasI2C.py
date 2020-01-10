@@ -8,7 +8,7 @@ import io
 import fcntl
 import time
 import copy
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 # the timeout needed to query readings and calibrations
 LONG_TIMEOUT: float = 1.5
@@ -58,18 +58,7 @@ class AtlasI2C:
         cmd += "\00"
         self.file_write.write(cmd.encode("latin-1"))
 
-    def _handle_raspi_glitch(self, response) -> List[str]:
-        """
-        Change MSB to 0 for all received characters except the first
-        and get a list of characters
-        NOTE: having to change the MSB to 0 is a glitch in the raspberry pi,
-        and you shouldn't have to do this!
-
-        TODO(tboring): figure out what this is really doing and what the "glitch" is
-        """
-        return list(map(lambda x: chr(x & ~0x80), list(response)))
-
-    def response_valid(self, response: bytes) -> Tuple[bool, Optional[str]]:
+    def response_valid(self, response: bytes) -> bool:
         valid: bool = True
         error_code: Optional[str] = None
         if len(response) > 0:
@@ -80,27 +69,20 @@ class AtlasI2C:
             if error_code != "1":  # 1:
                 valid = False
 
-        return valid, error_code
+        return valid
 
-    def get_device_info(self):
-        if self._name == "":
-            return self._module + " " + str(self.address)
-        else:
-            return self._module + " " + str(self.address) + " " + self._name
-
-    def read(self, num_of_bytes: int = 31) -> str:
+    def read(self, num_of_bytes: int = 31) -> float:
         """Read a specified number of bytes from I2C."""
 
         raw_data: bytes = self.file_read.read(num_of_bytes)
-        # TODO: how to specify types when when unpacking a tuple
-        is_valid, error_code = self.response_valid(response=raw_data)
+        is_valid: bool = self.response_valid(response=raw_data)
 
         if is_valid:
-            char_list: List[str] = self._handle_raspi_glitch(raw_data[1:])
-            # TODO: why build a string instead of just returning the actual data as a float?
-            result = "Success " + self.get_device_info() + ": " + str("".join(char_list))
+            data = raw_data[1:].strip().strip(b"\x00")
+            result = float(data)
         else:
-            result = "Error " + self.get_device_info() + ": " + error_code
+            pass
+            # result = "Error " + self.get_device_info() + ": " + error_code
 
         return result
 
@@ -113,7 +95,7 @@ class AtlasI2C:
 
         return timeout
 
-    def query(self, command) -> str:
+    def query(self, command) -> Union[float, str]:
         """Write a command to the board and read the response."""
         self.write(command)
         current_timeout: Optional[float] = self.get_command_timeout(command=command)
