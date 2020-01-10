@@ -1,6 +1,6 @@
 """Class to communicate with Atlas Scientific I2C sensors.
 
-Source code taken from Atlas Scientific examples:
+Source code is based on examples from Atlas Scientific:
 https://github.com/AtlasScientific/Raspberry-Pi-sample-code/blob/master/AtlasI2C.py
 """
 
@@ -16,47 +16,42 @@ LONG_TIMEOUT: float = 1.5
 SHORT_TIMEOUT: float = 0.3
 # the default bus for I2C on the newer Raspberry Pis, # certain older boards use bus 0
 DEFAULT_BUS: int = 1
-# the default address for the sensor
-DEFAULT_ADDRESS: int = 98
 LONG_TIMEOUT_COMMANDS: Tuple[str, str] = ("R", "CAL")
 SLEEP_COMMANDS: Tuple[str] = ("SLEEP",)
+I2C_SLAVE = 0x703
 
 
 class AtlasI2C:
     def __init__(
         self,
-        address: int = DEFAULT_ADDRESS,
+        address: int = None,
         name: str = None,
         bus: int = DEFAULT_BUS,
         long_timeout: float = LONG_TIMEOUT,
         short_timeout: float = SHORT_TIMEOUT,
     ) -> None:
         """Initializer."""
-        self.address: int = address
         self.name: Optional[str] = name
         self.bus: int = bus
         self.long_timeout = long_timeout
         self.short_timeout = short_timeout
 
-    def open_file_streams(
-        self, read_file: str = "/dev/i2c-{}", write_file: str = "/dev/i2c-{}"
-    ) -> None:
-        # TODO: do we actually need two streams?
-        self.file_read = io.open(file=read_file.format(self.bus), mode="rb", buffering=0)
-        self.file_write = io.open(file=write_file.format(self.bus), mode="wb", buffering=0)
+        if address:
+            self.set_i2c_address(address)
+
+    def open_file(self, device_file: str = "/dev/i2c-{}") -> None:
+        self.device_file = io.open(file=device_file.format(self.bus), mode="r+b", buffering=0)
 
     def set_i2c_address(self, addr) -> None:
         """Set I2C communication."""
-        # TODO: what is this actually doing? and should I2C_SLAVE be hardcoded like this?
-        I2C_SLAVE = 0x703
-        fcntl.ioctl(self.file_read, I2C_SLAVE, addr)
-        fcntl.ioctl(self.file_write, I2C_SLAVE, addr)
+        self.open_file()
+        fcntl.ioctl(self.device_file, I2C_SLAVE, addr)
         self.address = addr
 
     def write(self, cmd: str) -> None:
         """Append the null character and sends the string over I2C."""
         cmd += "\00"
-        self.file_write.write(cmd.encode("latin-1"))
+        self.device_file.write(cmd.encode("latin-1"))
 
     def response_valid(self, response: bytes) -> bool:
         valid: bool = True
@@ -74,7 +69,7 @@ class AtlasI2C:
     def read(self, num_of_bytes: int = 31) -> float:
         """Read a specified number of bytes from I2C."""
 
-        raw_data: bytes = self.file_read.read(num_of_bytes)
+        raw_data: bytes = self.device_file.read(num_of_bytes)
         is_valid: bool = self.response_valid(response=raw_data)
 
         if is_valid:
@@ -109,10 +104,14 @@ class AtlasI2C:
         self.file_read.close()
         self.file_write.close()
 
-    def list_i2c_devices(self) -> List:
+    def list_i2c_devices(self) -> List[int]:
+        """List I2C devices.
+
+        Valid addresses are integers between 1 - 127 per the EZO datasheets, e.g.:
+        https://www.atlas-scientific.com/_files/_datasheets/_circuit/EZO_RTD_Datasheet.pdf
+        """
         prev_addr: int = copy.deepcopy(self.address)
-        i2c_devices: List = []
-        # TODO: since this is targeted to Atlas Scientific devices, do we need to check from 0-128?
+        i2c_devices: List[int] = []
         for i in range(0, 128):
             try:
                 self.set_i2c_address(i)
