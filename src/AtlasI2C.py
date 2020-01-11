@@ -17,33 +17,41 @@ import io
 import fcntl
 import time
 import copy
-from typing import List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple
 
-# the timeout needed to query readings and calibrations
-LONG_TIMEOUT: float = 1.5
-# timeout for regular commands
-SHORT_TIMEOUT: float = 0.3
-# the default bus for I2C on the newer Raspberry Pis, # certain older boards use bus 0
+PROCESS_DELAYS_MS: Dict = {"short": 300, "long": 600}
+COMMAND_PROCESS_DELAYS: Dict = {
+    "i": PROCESS_DELAYS_MS["short"],
+    "Cal,t": PROCESS_DELAYS_MS["long"],
+    "Cal,clear": PROCESS_DELAYS_MS["short"],
+    "Cal,?": PROCESS_DELAYS_MS["short"],
+    "R": PROCESS_DELAYS_MS["long"],
+    "Status": PROCESS_DELAYS_MS["short"],
+}
 DEFAULT_BUS: int = 1
 LONG_TIMEOUT_COMMANDS: Tuple[str, str] = ("R", "CAL")
 SLEEP_COMMANDS: Tuple[str] = ("SLEEP",)
-I2C_SLAVE = 0x703
+I2C_SLAVE = 0x0703
+
+
+ERROR_CODES = {2: "SYNTAX ERROR", 254: "NOT READY", 255: "NO DATA TO SEND"}
+
+
+class Error(Exception):
+    pass
+
+
+class ReadError(Error):
+    def __init__(self, error_code: int, message: str):
+        self.error_code = error_code
+        self.message = message
 
 
 class AtlasI2C:
-    def __init__(
-        self,
-        address: int = None,
-        name: str = None,
-        bus: int = DEFAULT_BUS,
-        long_timeout: float = LONG_TIMEOUT,
-        short_timeout: float = SHORT_TIMEOUT,
-    ) -> None:
+    def __init__(self, address: int = None, name: str = None, bus: int = DEFAULT_BUS,) -> None:
         """Initializer."""
         self.name: Optional[str] = name
         self.bus: int = bus
-        self.long_timeout = long_timeout
-        self.short_timeout = short_timeout
 
         if address:
             self.set_i2c_address(address)
@@ -62,52 +70,33 @@ class AtlasI2C:
         cmd += "\00"
         self.device_file.write(cmd.encode("latin-1"))
 
-    def _response_valid(self, response: bytes) -> bool:
-        valid: bool = True
-        error_code: Optional[str] = None
+    def _check_response(self, response: bytes) -> bool:
         if len(response) > 0:
+            return response[0] == 1
 
-            error_code = str(response[0])
-
-            # TODO: should this raise an exception instead of setting a var to False?
-            if error_code != "1":  # 1:
-                valid = False
-
-        return valid
+        return False
 
     def read(self, num_of_bytes: int = 31) -> float:
         """Read a specified number of bytes from I2C."""
 
         raw_data: bytes = self.device_file.read(num_of_bytes)
-        is_valid: bool = self._response_valid(response=raw_data)
 
-        if is_valid:
+        if self._check_response(response=raw_data):
             data = raw_data[1:].strip().strip(b"\x00")
             result = float(data)
         else:
-            pass
-            # result = "Error " + self.get_device_info() + ": " + error_code
+            raise ReadError(error_code=raw_data[0], message=ERROR_CODES[raw_data[0]])
 
         return result
 
-    def _get_command_timeout(self, command: str) -> Optional[float]:
-        timeout: Optional[float] = None
-        if command.upper().startswith(LONG_TIMEOUT_COMMANDS):
-            timeout = self.long_timeout
-        elif not command.upper().startswith(SLEEP_COMMANDS):
-            timeout = self.short_timeout
-
-        return timeout
-
-    def query(self, command) -> Union[float, str]:
+    def query(self, command) -> float:
         """Write a command to the sensor and read the response."""
         self.write(command)
-        current_timeout: Optional[float] = self._get_command_timeout(command=command)
-        if not current_timeout:
-            return "sleep mode"
-        else:
-            time.sleep(current_timeout)
-            return self.read()
+        process_delay: Optional[int] = COMMAND_PROCESS_DELAYS.get(command)
+        if process_delay:
+            time.sleep(process_delay / 1000)
+
+        return self.read()
 
     def close(self):
         self.device_file.close()
