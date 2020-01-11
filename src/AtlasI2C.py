@@ -100,23 +100,3 @@ class AtlasI2C:
 
     def close(self):
         self.device_file.close()
-
-    def list_i2c_devices(self) -> List[int]:
-        """List I2C devices.
-
-        Valid addresses are integers between 1 - 127 per the EZO datasheets, e.g.:
-        https://www.atlas-scientific.com/_files/_datasheets/_circuit/EZO_RTD_Datasheet.pdf
-        """
-        prev_addr: int = copy.deepcopy(self.address)
-        i2c_devices: List[int] = []
-        for i in range(0, 128):
-            try:
-                self.set_i2c_address(i)
-                self.read(1)
-                i2c_devices.append(i)
-            except IOError:
-                pass
-        # restore the address we were using
-        self.set_i2c_address(prev_addr)
-
-        return i2c_devices

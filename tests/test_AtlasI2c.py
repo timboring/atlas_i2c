@@ -20,26 +20,25 @@ class TestAtlasI2C:
     @pytest.mark.parametrize(
         "command",
         [
-            "Baud",
-            "Cal",
-            "D",
-            "Export",
+            "Baud,9600",
+            "Cal,?",
+            "D,?",
+            "Export,?",
             "Factory",
             "Find",
             "i",
-            "I2C",
-            "Import",
-            "L",
-            "M",
-            "Plock",
+            "I2C,100",
+            "L,?",
+            "M,?",
+            "Plock,?",
             "R",
-            "S",
+            "S,?",
             "Sleep",
             "Status",
         ],
     )
     def test_write(self, command):
-        device_file = tempfile.TemporaryFile()
+        device_file = io.BytesIO()
         dev = AtlasI2C()
         dev.device_file = device_file
         dev.write(command)
@@ -69,6 +68,3 @@ class TestAtlasI2C:
             response = dev.read()
         assert ex.value.error_code == response[0]
         assert ex.value.message == ERROR_CODES[response[0]]
-
-    def test_get_command_process_delay(self):
-        pass
