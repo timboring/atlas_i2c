@@ -13,10 +13,6 @@ NOT_READY_RESPONSE = b"\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\
 
 
 class TestAtlasI2C:
-    def test_init(self):
-        dev = AtlasI2C()
-        assert isinstance(dev, AtlasI2C)
-
     @pytest.mark.parametrize(
         "command",
         [
