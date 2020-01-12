@@ -75,10 +75,15 @@ class AtlasI2C:
         return False
 
     def read(self, num_of_bytes: int = 31) -> float:
-        """Read a specified number of bytes from I2C."""
+        """Read a specified number of bytes from I2C.
+
+        Raises:
+            ReadError when response from device is not successful (i.e. not 1)
+        """
 
         raw_data: bytes = self.device_file.read(num_of_bytes)
 
+        # TODO: is response is 254 (not ready), should this retry?
         if self._check_response(response=raw_data):
             data = raw_data[1:].strip().strip(b"\x00")
             result = float(data)
@@ -88,7 +93,11 @@ class AtlasI2C:
         return result
 
     def query(self, command) -> float:
-        """Write a command to the sensor and read the response."""
+        """Write a command to the sensor and read the response.
+
+        Raises:
+            ReadError on any failures in self.read()
+        """
         self.write(command)
         process_delay: Optional[int] = COMMAND_PROCESS_DELAYS.get(command)
         if process_delay:
