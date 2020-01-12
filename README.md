@@ -1,10 +1,17 @@
 # AtlasI2C: Class to communicate with Atlas Scientific devices in I2C mode.
 
 # Installation
+## From PyPi
 Installation can be done using Pip:
 
 ```sh
 > pip install atlas_i2c
+```
+
+## From source
+```sh
+> python setup.py bdist_wheel
+> pip install dist/atlas_i2c-$version-py3-none-any.whl
 ```
 
 # Usage
