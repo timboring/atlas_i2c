@@ -16,10 +16,9 @@ flo: https://www.atlas-scientific.com/_files/_datasheets/_circuit/flow_EZO_Datas
 import io
 import fcntl
 import time
-import copy
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional, Tuple
 
-PROCESS_DELAYS_MS: Dict = {"short": 300, "long": 600}
+PROCESS_DELAYS_MS: Dict = {"short": 300, "long": 1500}
 COMMAND_PROCESS_DELAYS: Dict = {
     "i": PROCESS_DELAYS_MS["short"],
     "Cal,t": PROCESS_DELAYS_MS["long"],
