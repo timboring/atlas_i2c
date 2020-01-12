@@ -83,7 +83,7 @@ class AtlasI2C:
 
         raw_data: bytes = self.device_file.read(num_of_bytes)
 
-        # TODO: is response is 254 (not ready), should this retry?
+        # TODO: if response is 254 (not ready), should this retry?
         if self._check_response(response=raw_data):
             data = raw_data[1:].strip().strip(b"\x00")
             result = float(data)
