@@ -16,9 +16,10 @@ flo: https://www.atlas-scientific.com/_files/_datasheets/_circuit/flow_EZO_Datas
 import io
 import fcntl
 import time
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional
 
 PROCESS_DELAYS_MS: Dict = {"short": 300, "long": 1500}
+# TODO: think of a better way to handle this command to delay mapping
 COMMAND_PROCESS_DELAYS: Dict = {
     "i": PROCESS_DELAYS_MS["short"],
     "Cal,t": PROCESS_DELAYS_MS["long"],
@@ -28,8 +29,6 @@ COMMAND_PROCESS_DELAYS: Dict = {
     "Status": PROCESS_DELAYS_MS["short"],
 }
 DEFAULT_BUS: int = 1
-LONG_TIMEOUT_COMMANDS: Tuple[str, str] = ("R", "CAL")
-SLEEP_COMMANDS: Tuple[str] = ("SLEEP",)
 I2C_SLAVE = 0x0703
 
 
