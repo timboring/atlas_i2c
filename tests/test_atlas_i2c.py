@@ -44,7 +44,7 @@ class TestAtlasI2C:
         assert dev._check_response(GOOD_RESPONSE)
 
     @pytest.mark.parametrize("response", [ERROR_RESPONSE, NO_DATA_RESPONSE, NOT_READY_RESPONSE,])
-    def test_check_not_ready_response(self, response):
+    def test_check_non_good_response(self, response):
         dev = AtlasI2C()
         assert not dev._check_response(response)
 
