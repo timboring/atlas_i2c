@@ -15,13 +15,13 @@ This module requires Python >= 3.6.
 ```sh
 > tox
 [output truncated]
- py38: commands succeeded
- py37: commands succeeded
- py36: commands succeeded
- mypy: commands succeeded
- lint: commands succeeded
- format: commands succeeded
- congratulations :)
+py38: commands succeeded
+py37: commands succeeded
+py36: commands succeeded
+mypy: commands succeeded
+lint: commands succeeded
+format: commands succeeded
+congratulations :)
 ```
 
 # Installation
