@@ -42,4 +42,5 @@ setup(
     python_requires=">=3.6",
     version=load_version(),
     long_description="".join(["\n", get_readme()]),
+    long_description_content_type="text/markdown",
 )
