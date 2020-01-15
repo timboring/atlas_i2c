@@ -16,23 +16,11 @@ flo: https://www.atlas-scientific.com/_files/_datasheets/_circuit/flow_EZO_Datas
 import io
 import fcntl
 import time
-from typing import Dict, Optional
 
-PROCESS_DELAYS_MS: Dict = {"short": 300, "long": 1500}
-# TODO: think of a better way to handle this command to delay mapping
-COMMAND_PROCESS_DELAYS: Dict = {
-    "i": PROCESS_DELAYS_MS["short"],
-    "Cal,t": PROCESS_DELAYS_MS["long"],
-    "Cal,clear": PROCESS_DELAYS_MS["short"],
-    "Cal,?": PROCESS_DELAYS_MS["short"],
-    "R": PROCESS_DELAYS_MS["long"],
-    "Status": PROCESS_DELAYS_MS["short"],
-}
+import commands
+
 DEFAULT_BUS: int = 1
 I2C_SLAVE = 0x0703
-
-
-ERROR_CODES = {2: "SYNTAX ERROR", 254: "NOT READY", 255: "NO DATA TO SEND"}
 
 
 class Error(Exception):
@@ -46,9 +34,8 @@ class ReadError(Error):
 
 
 class AtlasI2C:
-    def __init__(self, address: int = None, name: str = None, bus: int = DEFAULT_BUS,) -> None:
+    def __init__(self, address: int = None, bus: int = DEFAULT_BUS,) -> None:
         """Initializer."""
-        self.name: Optional[str] = name
         self.bus: int = bus
 
         if address:
@@ -68,13 +55,15 @@ class AtlasI2C:
         cmd += "\00"
         self.device_file.write(cmd.encode("latin-1"))
 
-    def _check_response(self, response: bytes) -> bool:
-        if len(response) > 0:
-            return response[0] == 1
+    def _handle_command_response(self, original_cmd: str, data: bytes) -> commands.CommandResponse:
+        response = commands.CommandResponse()
+        response.sensor_address = self.address
+        response.original_cmd = original_cmd
+        response.status_code = int(data[0])
+        response.data = str(data[1:].strip().strip(b"\x00"))
+        return response
 
-        return False
-
-    def read(self, num_of_bytes: int = 31) -> float:
+    def read(self, original_cmd: str, num_of_bytes: int = 31) -> commands.CommandResponse:
         """Read a specified number of bytes from I2C.
 
         Raises:
@@ -84,26 +73,18 @@ class AtlasI2C:
         raw_data: bytes = self.device_file.read(num_of_bytes)
 
         # TODO: if response is 254 (not ready), should this retry?
-        if self._check_response(response=raw_data):
-            data = raw_data[1:].strip().strip(b"\x00")
-            result = float(data)
-        else:
-            raise ReadError(error_code=raw_data[0], message=ERROR_CODES[raw_data[0]])
-
+        result: commands.CommandResponse = self._handle_command_response(original_cmd, raw_data)
         return result
 
-    def query(self, command) -> float:
+    def query(self, command: str, processing_delay: int = 300) -> commands.CommandResponse:
         """Write a command to the sensor and read the response.
 
         Raises:
             ReadError on any failures in self.read()
         """
         self.write(command)
-        process_delay: Optional[int] = COMMAND_PROCESS_DELAYS.get(command)
-        if process_delay:
-            time.sleep(process_delay / 1000)
-
-        return self.read()
+        time.sleep(processing_delay / 1000)
+        return self.read(original_cmd=command)
 
     def close(self):
         self.device_file.close()
