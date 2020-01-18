@@ -5,9 +5,9 @@ from unittest.mock import Mock
 
 import pytest
 
-from atlas_i2c import AtlasI2C, ReadError
-import commands
-import constants
+from atlas_i2c import atlas_i2c
+from atlas_i2c import commands
+from atlas_i2c import constants
 
 GOOD_RESPONSE = b"\x011.642\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 ERROR_RESPONSE = b"\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
@@ -38,14 +38,14 @@ class TestAtlasI2C:
     )
     def test_write(self, command):
         device_file = io.BytesIO()
-        dev = AtlasI2C()
+        dev = atlas_i2c.AtlasI2C()
         dev.address = 102
         dev.device_file = device_file
         dev.write(command)
 
     def test_read(self):
         device_file = io.BytesIO(GOOD_RESPONSE)
-        dev = AtlasI2C()
+        dev = atlas_i2c.AtlasI2C()
         dev.address = 102
         dev.device_file = device_file
         response = dev.read(original_cmd="R")

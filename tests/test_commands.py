@@ -1,6 +1,6 @@
 import pytest
 
-import commands
+from atlas_i2c import commands
 
 
 class TestBaudCommand:
