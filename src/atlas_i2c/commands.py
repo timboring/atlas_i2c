@@ -25,7 +25,7 @@ class CommandResponse:
     original_cmd: str
     response_type: str
     status_code: int
-    data: Union[float, str]
+    data: bytes
 
 
 class Command(ABC):

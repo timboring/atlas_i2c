@@ -55,7 +55,8 @@ class AtlasI2C:
         response.sensor_address = self.address
         response.original_cmd = original_cmd
         response.status_code = int(data[0])
-        response.data = str(data[1:].strip().strip(b"\x00"))
+        # TODO: find out why mypy complains about incompatible types for response.data
+        response.data = data[1:].strip().strip(b"\x00")  # type: ignore
         return response
 
     def read(self, original_cmd: str, num_of_bytes: int = 31) -> CommandResponse:
