@@ -40,6 +40,45 @@ time.sleep(1.5)
 result = dev.read()
 ```
 
+The result of calling `dev.read()` in the above code snippet is a `CommandReponse` object. Here is an example of creating a `CommandResponse` object manually and populating it:
+```py
+In [1]: from atlas_i2c import atlas_i2c                                                                                                 
+In [2]: response = atlas_i2c.CommandResponse()                                                                                          
+In [3]: response                                                                                                                        
+Out[3]: <atlas_i2c.atlas_i2c.CommandResponse at 0x7fbd40f48370>
+In [6]: response.sensor_address = 10                                                                                                    
+In [7]: response.sensor_address = 102                                                                                                   
+In [8]: response.original_cmd = "R"                                                                                                     
+In [9]: response.response_type = "str"                                                                                                  
+In [10]: response.status_code = raw_data[0] 
+```
+
+## module: commands
+The `commands` module provides encapsulations intended to simplify interactions with sensors. Command attributes and methods can be accessed at the class level, thus it's not necessary to instantiate a command.
+
+The module defines constants for each command class:
+```py
+In [19]: from atlas_i2c import commands                                                                                            
+# To find the argument a command supports:
+In [24]: commands.BAUD.arguments                                                                                                        
+Out[24]: (300, 1200, 2400, 9600, 19200, 38400, 57600, 115200)
+# To get a formatted command string:
+In [25]: commands.BAUD.format_command(300)                                                                                              
+Out[25]: 'Baud,300'
+# A command may not support any arguments:
+```
+Not all commands have been implemented. The `format_command` method on unimplemented commands will raise a `NotImplementedError` exception.
+
+## module: sensors
+The `sensors` module provides a higher-level encapsulation of a sensor in the form of the `Sensor` class. The intention is that the `Sensor` class is used as the primary means of communication; it uses the lower-level `AtlasI2C` class to perform all functions, such as reading data from a sensor.
+
+```py
+In [31]: from atlas_i2c import sensors                                                                                                  
+In [32]: sensor = sensors.Sensor("Temperature", 102)                                                                                    
+In [33]: sensor.connect() 
+In [34]: response = sensor.query(commands.READ)
+```
+
 # Supported Python Versions
 This module requires Python >= 3.6.
 
@@ -72,11 +111,11 @@ Installation can be done using Pip:
 > pip install dist/atlas_i2c-$version-py3-none-any.whl
 ```
 
-# Usage
-```py
-from atlas_i2c import AtlasI2C
-
-dev = AtlasI2C()
-dev.set_i2c_address(102)
-print(dev.query("R"))  # returns a reading from the I2C sensor as a float
-```
+# Atlas Scientific Sensor Datasheets
+- [pH](https://www.atlas-scientific.com/_files/_datasheets/_circuit/pH_EZO_Datasheet.pdf)
+- [temp](https://www.atlas-scientific.com/_files/_datasheets/_circuit/EZO_RTD_Datasheet.pdf)
+- [orp](https://www.atlas-scientific.com/_files/_datasheets/_circuit/ORP_EZO_datasheet.pdf)
+- [do](https://www.atlas-scientific.com/_files/_datasheets/_circuit/DO_EZO_Datasheet.pdf)
+- [ec](https://www.atlas-scientific.com/_files/_datasheets/_circuit/EC_EZO_Datasheet.pdf)
+- [co2](https://www.atlas-scientific.com/_files/_datasheets/_probe/EZO_CO2_Datasheet.pdf)
+- [flo](https://www.atlas-scientific.com/_files/_datasheets/_circuit/flow_EZO_Datasheet.pdf)

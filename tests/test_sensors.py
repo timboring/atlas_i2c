@@ -8,7 +8,7 @@ from atlas_i2c import atlas_i2c
 
 
 class TestSensor:
-    def test_query_without_args(self):
+    def test_query_without_args(self, good_response):
         i2c_client = atlas_i2c.AtlasI2C()
         i2c_client.query = Mock()
         response = atlas_i2c.CommandResponse()
@@ -16,7 +16,7 @@ class TestSensor:
         response.sensor_address = 102
         response.original_command = "R"
         response.response_type = str
-        response.response_data = "1.04"
+        response.response_data = good_response
         i2c_client.query.return_value = response
         sensor = sensors.Sensor("test-sensor", i2c_client=i2c_client)
         result = sensor.query(commands.READ)
