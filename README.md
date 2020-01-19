@@ -31,8 +31,6 @@ import time
 from atlas_i2c import atlas_i2c
 
 sensor_address = 102
-fd = open("/dev/i2c-1", "r+b")
-fcnt.iotl(fd, 0x703, sensor_address)
 dev = atlas_i2c.Atlas_I2C()
 dev.set_i2c_address(sensor_address)
 dev.write("R")
@@ -102,7 +100,7 @@ congratulations :)
 Installation can be done using Pip:
 
 ```sh
-> pip install atlas_i2c
+> pip install atlas-i2c
 ```
 
 ## From source
