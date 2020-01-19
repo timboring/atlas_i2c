@@ -29,5 +29,7 @@ class Sensor:
         response: atlas_i2c.CommandResponse = self.client.query(
             command, processing_delay=cmd.processing_delay
         )
+        # TODO: this doesn't feel like the right place to set the name of this attribute
+        response.sensor_name = self.name
 
         return response
