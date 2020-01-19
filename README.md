@@ -9,10 +9,10 @@ This package provides functionality that is based on the [example code](https://
 # Overview
 This package provides the following modules:
 
-- [atlas_i2c](src/atlas_i2c.py)
-- [commands](src/commands.py)
-- [constants](src/constants.py)
-- [sensors](src/sensors.py)
+- [atlas_i2c](https://github.com/timboring/atlas_i2c/blob/master/src/atlas_i2c/atlas_i2c.py)
+- [commands](https://github.com/timboring/atlas_i2c/blob/master/src/atlas_i2c/commands.py)
+- [constants](https://github.com/timboring/atlas_i2c/blob/master/src/atlas_i2c/constants.py)
+- [sensors](https://github.com/timboring/atlas_i2c/blob/master/src/atlas_i2c/sensors.py)
 
 ## module: atlas_i2c
 The `atlas_i2c` module can be thought of as the client that talks to the server, similar to how an HTTP client talks to an HTTP server. The server in this scenario is the Atlas Scientfic EZO sensor. Instead of talking over TCP using HTTP, however, it talks to the server over the I2C bus, using Linux device files (e.g. `/dev/-i2c-1`).
