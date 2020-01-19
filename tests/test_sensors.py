@@ -11,7 +11,7 @@ class TestSensor:
     def test_query_without_args(self):
         i2c_client = atlas_i2c.AtlasI2C()
         i2c_client.query = Mock()
-        response = commands.CommandResponse()
+        response = atlas_i2c.CommandResponse()
         response.sensor_name = "test-sensor"
         response.sensor_address = 102
         response.original_command = "R"
@@ -20,13 +20,13 @@ class TestSensor:
         i2c_client.query.return_value = response
         sensor = sensors.Sensor("test-sensor", i2c_client=i2c_client)
         result = sensor.query(commands.READ)
-        assert isinstance(result, commands.CommandResponse)
+        assert isinstance(result, atlas_i2c.CommandResponse)
         assert result == response
 
     def test_query_with_args(self):
         i2c_client = atlas_i2c.AtlasI2C()
         i2c_client.query = Mock()
-        response = commands.CommandResponse()
+        response = atlas_i2c.CommandResponse()
         response.sensor_name = "test-sensor"
         response.sensor_address = 102
         response.original_command = "S,?"
@@ -35,7 +35,7 @@ class TestSensor:
         i2c_client.query.return_value = response
         sensor = sensors.Sensor("test-sensor", i2c_client=i2c_client)
         result = sensor.query(commands.SCALE, arguments="?")
-        assert isinstance(result, commands.CommandResponse)
+        assert isinstance(result, atlas_i2c.CommandResponse)
         assert result == response
 
     def test_query_with_nonexisting_command(self):

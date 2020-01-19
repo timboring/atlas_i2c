@@ -49,4 +49,4 @@ class TestAtlasI2C:
         dev.address = 102
         dev.device_file = device_file
         response = dev.read(original_cmd="R")
-        assert isinstance(response, commands.CommandResponse)
+        assert isinstance(response, atlas_i2c.CommandResponse)
