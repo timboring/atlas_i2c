@@ -7,7 +7,7 @@ https://github.com/AtlasScientific/Raspberry-Pi-sample-code/blob/master/AtlasI2C
 import io
 import fcntl
 import time
-from typing import Union
+from typing import Optional, Union
 
 
 DEFAULT_BUS: int = 1
@@ -72,14 +72,15 @@ class AtlasI2C:
         result: CommandResponse = self._handle_command_response(original_cmd, raw_data)
         return result
 
-    def query(self, command: str, processing_delay: int = 300) -> CommandResponse:
+    def query(self, command: str, processing_delay: Optional[int] = None) -> CommandResponse:
         """Write a command to the sensor and read the response.
 
         Raises:
             ReadError on any failures in self.read()
         """
         self.write(command)
-        time.sleep(processing_delay / 1000)
+        if processing_delay:
+            time.sleep(processing_delay / 1000)
         return self.read(original_cmd=command)
 
     def close(self):

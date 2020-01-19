@@ -26,6 +26,8 @@ class Sensor:
         else:
             command = cmd.format_command()
 
-        response: atlas_i2c.CommandResponse = self.client.query(command)
+        response: atlas_i2c.CommandResponse = self.client.query(
+            command, processing_delay=cmd.processing_delay
+        )
 
         return response

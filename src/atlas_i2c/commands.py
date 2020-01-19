@@ -1,5 +1,5 @@
 from abc import ABC, abstractclassmethod
-from typing import Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 
 class Error(Exception):
@@ -29,6 +29,10 @@ class CommandResponse:
 
 
 class Command(ABC):
+    arguments: Any
+    name: str
+    processing_delay: Optional[int]
+
     @abstractclassmethod
     def format_command(cls):
         raise NotImplementedError
