@@ -23,31 +23,45 @@ The module uses the following protocol to communicate with a sensor:
 3. Wait for N milliseconds for the sensor to process the command
 4. Read the resulting data from the device file
 
-Using this module to communicate with a sensor looks like the following:
+At the lowest level, this module's `read()` and `write()` methods can be combined with `time.sleep()`  to communicate with a sensor:
 ```py
-import fcntl
-import time
-
-from atlas_i2c import atlas_i2c
-
-sensor_address = 102
-dev = atlas_i2c.Atlas_I2C()
-dev.set_i2c_address(sensor_address)
-dev.write("R")
-time.sleep(1.5)
-result = dev.read()
+In [1]: from atlas_i2c import atlas_i2c
+In [2]: sensor_address = 102
+In [3]: dev = atlas_i2c.AtlasI2C()
+In [4]: dev.set_i2c_address(sensor_address)
+In [5]: dev.write("R")
+In [6]: time.sleep(1.5)
+In [15]: result = dev.read("R")
+In [16]: result.status_code
+Out[16]: 1
+In [17]: result.data
+Out[17]: b'0.922'
+In [18]: result.original_cmd
+Out[18]: 'R'
 ```
 
-The result of calling `dev.read()` in the above code snippet is a `CommandReponse` object. Here is an example of creating a `CommandResponse` object manually and populating it:
+The module also provides a `query()` method to conveniently wrap the above protocol into a single method:
+
 ```py
-In [1]: from atlas_i2c import atlas_i2c                                                                                                 
-In [2]: response = atlas_i2c.CommandResponse()                                                                                          
-In [3]: response                                                                                                                        
+In [19]: result = dev.query("R", processing_delay=1500)
+In [20]: result.status_code
+Out[20]: 1
+In [21]: result.data
+Out[21]: b'0.926'
+In [22]: result.original_cmd
+Out[22]: 'R'
+```
+
+The result of calling the `read()` and `query()` methods in the above code snippets is a `CommandReponse` object. Here is an example of creating a `CommandResponse` object manually and populating it:
+```py
+In [1]: from atlas_i2c import atlas_i2c
+In [2]: response = atlas_i2c.CommandResponse()
+In [3]: response
 Out[3]: <atlas_i2c.atlas_i2c.CommandResponse at 0x7fbd40f48370>
-In [6]: response.sensor_address = 10                                                                                                    
-In [7]: response.sensor_address = 102                                                                                                   
-In [8]: response.original_cmd = "R"                                                                                                     
-In [9]: response.response_type = "str"                                                                                                  
+In [6]: response.sensor_address = 10
+In [7]: response.sensor_address = 102
+In [8]: response.original_cmd = "R"
+In [9]: response.response_type = "str"
 In [10]: response.status_code = raw_data[0] 
 ```
 
@@ -56,14 +70,16 @@ The `commands` module provides encapsulations intended to simplify interactions 
 
 The module defines constants for each command class:
 ```py
-In [19]: from atlas_i2c import commands                                                                                            
-# To find the argument a command supports:
-In [24]: commands.BAUD.arguments                                                                                                        
+In [19]: from atlas_i2c import commands
+# To find the arguments a command supports:
+In [24]: commands.BAUD.arguments
 Out[24]: (300, 1200, 2400, 9600, 19200, 38400, 57600, 115200)
 # To get a formatted command string:
-In [25]: commands.BAUD.format_command(300)                                                                                              
+In [25]: commands.BAUD.format_command(300)
 Out[25]: 'Baud,300'
 # A command may not support any arguments:
+In [24]: commands.READ.arguments
+In [25]:
 ```
 Not all commands have been implemented. The `format_command` method on unimplemented commands will raise a `NotImplementedError` exception.
 
@@ -71,10 +87,16 @@ Not all commands have been implemented. The `format_command` method on unimpleme
 The `sensors` module provides a higher-level encapsulation of a sensor in the form of the `Sensor` class. The intention is that the `Sensor` class is used as the primary means of communication; it uses the lower-level `AtlasI2C` class to perform all functions, such as reading data from a sensor.
 
 ```py
-In [31]: from atlas_i2c import sensors                                                                                                  
-In [32]: sensor = sensors.Sensor("Temperature", 102)                                                                                    
-In [33]: sensor.connect() 
-In [34]: response = sensor.query(commands.READ)
+In [25]: from atlas_i2c import sensors
+In [26]: sensor = sensors.Sensor("Temperature", 102)
+In [27]: sensor.connect()
+In [28]: response = sensor.query(commands.READ)
+In [29]: response.status_code
+Out[29]: 1
+In [30]: response.data
+Out[30]: b'0.923'
+In [31]: response.original_cmd
+Out[31]: 'R'
 ```
 
 # Supported Python Versions
