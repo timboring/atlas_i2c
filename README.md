@@ -1,4 +1,4 @@
-![Continuous integration](https://github.com/timboring/atlas_i2c/workflows/Continuous%20integration/badge.svg)
+![Continuous integration](https://github.com/timboring/atlas_i2c/workflows/Continuous%20integration/badge.svg) ![Continous delivery](https://github.com/timboring/atlas_i2c/workflows/Continous%20delivery/badge.svg)
 
 # AtlasI2C: A Python package to communicate with Atlas Scientific devices in I2C mode.
 
