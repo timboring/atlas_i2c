@@ -1,3 +1,5 @@
+![Continuous integration](https://github.com/timboring/atlas_i2c/workflows/Continuous%20integration/badge.svg)
+
 # AtlasI2C: A Python package to communicate with Atlas Scientific devices in I2C mode.
 
 This package provides functionality that is based on the [example code](https://github.com/AtlasScientific/Raspberry-Pi-sample-code) from Atlas Scientific. It has the following goals:
