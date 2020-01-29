@@ -39,6 +39,7 @@ class Command(ABC):
 
 
 class Baud(Command):
+    """Set device baud rate; used to switch from I2C to UART mode."""
 
     arguments: Tuple[int, int, int, int, int, int, int, int] = (
         300,
@@ -65,13 +66,30 @@ class Baud(Command):
 
 
 class Calibrate(Command):
+    # NB: This command is complicated, because sensors have different calibration arguments
     # TODO: implement me
     @classmethod
     def format_command(cls):
         raise NotImplementedError
 
 
+class DataLogger(Command):
+    """Enable/disable data logger."""
+
+    arguments: Tuple[Tuple, str] = (tuple(range(0, 32001)), "?")
+    name: str = "DataLogger"
+    processing_delay: int = 300
+
+    @classmethod
+    def format_command(cls, arg: Union[int, str] = "?") -> str:
+        if arg not in cls.arguments and arg not in cls.arguments[0]:
+            raise ArgumentError(f"{arg} must be in range(0, 32001) or '?'")
+        return f"{cls.name},{arg}"
+
+
 class Export(Command):
+    """Export calibration settings."""
+
     # TODO: implement me
     @classmethod
     def format_command(cls):
@@ -79,6 +97,7 @@ class Export(Command):
 
 
 class Factory(Command):
+    """Factory reset."""
 
     arguments: None = None
     name: str = "Factory"
@@ -90,6 +109,8 @@ class Factory(Command):
 
 
 class Find(Command):
+    """Find a device by making the LED rapidly blink white."""
+
     # TODO: implement me
     @classmethod
     def format_command(cls):
@@ -97,6 +118,7 @@ class Find(Command):
 
 
 class Info(Command):
+    """Get info about a device."""
 
     arguments: None = None
     name: str = "i"
@@ -108,6 +130,7 @@ class Info(Command):
 
 
 class I2C(Command):
+    """Set I2C address and reboot device."""
 
     addresses = tuple(range(1, 128))
     name: str = "I2C"
@@ -125,6 +148,8 @@ class I2C(Command):
 
 
 class Import(Command):
+    """Import calibration string."""
+
     # TODO: implement me
     @classmethod
     def format_command(cls):
@@ -132,13 +157,21 @@ class Import(Command):
 
 
 class Led(Command):
-    # TODO: implement me
+    "Turn LED on/off."
+
+    arguments: Tuple[int, int, str] = (1, 0, "?")
+    name: str = "L"
+    processing_delay: int = 300
+
     @classmethod
-    def format_command(cls):
-        raise NotImplementedError
+    def format_command(cls, arg: Union[int, str] = "?") -> str:
+        if arg not in cls.arguments:
+            raise ArgumentError(f"{arg} must be one of {cls.arguments}")
+        return f"{cls.name},{arg}"
 
 
 class PLock(Command):
+    """Turn protocol lock on/off."""
 
     arguments: Tuple[int, int, str] = (1, 0, "?")
     name: str = "Plock"
@@ -152,6 +185,7 @@ class PLock(Command):
 
 
 class Read(Command):
+    """Take a reading from a device."""
 
     arguments: None = None
     name: str = "R"
@@ -163,6 +197,7 @@ class Read(Command):
 
 
 class Salinity(Command):
+    """Salinity compensation."""
 
     arguments: None = None
     name: str = "S"
@@ -194,6 +229,7 @@ class Salinity(Command):
 
 
 class Scale(Command):
+    """Set temperature scale."""
 
     arguments: Tuple[str, str, str, str] = ("c", "k", "f", "?")
     name: str = "S"
@@ -208,6 +244,7 @@ class Scale(Command):
 
 
 class Sleep(Command):
+    """Put device into sleep/lower power mode."""
 
     arguments: None = None
     name: str = "Sleep"
@@ -219,6 +256,7 @@ class Sleep(Command):
 
 
 class Status(Command):
+    """Get status device status information."""
 
     arguments: None = None
     name: str = "Status"

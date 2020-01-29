@@ -16,6 +16,19 @@ class TestBaudCommand:
             commands.Baud.format_command(arg)
 
 
+class TestDataLoggerCommand:
+    @pytest.mark.parametrize("arg", [0, 10, 5000, 32000, "?"])
+    def test_format_command(self, arg):
+        data_logger = commands.DataLogger
+        cmd = data_logger.format_command(arg)
+        assert cmd == f"{data_logger.name},{arg}"
+
+    @pytest.mark.parametrize("arg", [-1, 32001, "!"])
+    def test_format_command_with_invalid_arg(self, arg):
+        with pytest.raises(commands.ArgumentError):
+            commands.DataLogger.format_command(arg)
+
+
 class TestFactoryCommand:
     def test_format_command(self):
         assert commands.Factory.format_command() == f"{commands.Factory.name}"
@@ -23,6 +36,19 @@ class TestFactoryCommand:
     def test_format_command_with_arg(self):
         with pytest.raises(TypeError):
             commands.Factory.format_command("foo")
+
+
+class TestLedCommand:
+    @pytest.mark.parametrize("arg", [1, 0, "?"])
+    def test_format_command(self, arg):
+        led = commands.Led
+        cmd = led.format_command(arg)
+        assert cmd == f"{led.name},{arg}"
+
+    @pytest.mark.parametrize("arg", [-1, 2, "!"])
+    def test_format_command_with_invalid_arg(self, arg):
+        with pytest.raises(commands.ArgumentError):
+            commands.Led.format_command(arg)
 
 
 class TestPLockCommand:
