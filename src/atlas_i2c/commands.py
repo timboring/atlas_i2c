@@ -18,16 +18,6 @@ class CommandClassDoesNotExistError(Error):
     pass
 
 
-class CommandResponse:
-
-    sensor_name: str
-    sensor_address: int
-    original_cmd: str
-    response_type: str
-    status_code: int
-    data: bytes
-
-
 class Command(ABC):
     arguments: Any
     name: str

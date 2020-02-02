@@ -1,3 +1,4 @@
+import io
 from unittest.mock import Mock, patch
 
 import pytest
@@ -9,7 +10,8 @@ from atlas_i2c import atlas_i2c
 
 class TestSensor:
     def test_query_without_args(self, good_response):
-        i2c_client = atlas_i2c.AtlasI2C()
+        device_file = io.BytesIO()
+        i2c_client = atlas_i2c.AtlasI2C(device_file=device_file)
         i2c_client.query = Mock()
         response = atlas_i2c.CommandResponse()
         response.sensor_name = "test-sensor"
@@ -24,7 +26,8 @@ class TestSensor:
         assert result == response
 
     def test_query_with_args(self):
-        i2c_client = atlas_i2c.AtlasI2C()
+        device_file = io.BytesIO()
+        i2c_client = atlas_i2c.AtlasI2C(device_file=device_file)
         i2c_client.query = Mock()
         response = atlas_i2c.CommandResponse()
         response.sensor_name = "test-sensor"
@@ -39,7 +42,8 @@ class TestSensor:
         assert result == response
 
     def test_query_with_nonexisting_command(self):
-        i2c_client = atlas_i2c.AtlasI2C()
+        device_file = io.BytesIO()
+        i2c_client = atlas_i2c.AtlasI2C(device_file=device_file)
         sensor = sensors.Sensor("test-sensor", i2c_client=i2c_client)
         with pytest.raises(AttributeError) as ex:
             sensor.query("eat")

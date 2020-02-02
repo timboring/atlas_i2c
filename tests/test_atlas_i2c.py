@@ -33,16 +33,14 @@ class TestAtlasI2C:
     )
     def test_write(self, command):
         device_file = io.BytesIO()
-        dev = atlas_i2c.AtlasI2C()
+        dev = atlas_i2c.AtlasI2C(device_file=device_file)
         dev.address = 102
-        dev.device_file = device_file
         dev.write(command)
 
     def test_read(self, good_response, error_response, no_data_response, not_ready_response):
         for response in (good_response, error_response, no_data_response, not_ready_response):
             device_file = io.BytesIO(response)
-            dev = atlas_i2c.AtlasI2C()
+            dev = atlas_i2c.AtlasI2C(device_file=device_file)
             dev.address = 102
-            dev.device_file = device_file
             response = dev.read(original_cmd="R")
             assert isinstance(response, atlas_i2c.CommandResponse)
