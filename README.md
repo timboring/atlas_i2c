@@ -134,10 +134,10 @@ Installation can be done using Pip:
 ```
 
 # Atlas Scientific Sensor Datasheets
-- [pH](https://www.atlas-scientific.com/_files/_datasheets/_circuit/pH_EZO_Datasheet.pdf)
-- [temp](https://www.atlas-scientific.com/_files/_datasheets/_circuit/EZO_RTD_Datasheet.pdf)
-- [orp](https://www.atlas-scientific.com/_files/_datasheets/_circuit/ORP_EZO_datasheet.pdf)
-- [do](https://www.atlas-scientific.com/_files/_datasheets/_circuit/DO_EZO_Datasheet.pdf)
-- [ec](https://www.atlas-scientific.com/_files/_datasheets/_circuit/EC_EZO_Datasheet.pdf)
-- [co2](https://www.atlas-scientific.com/_files/_datasheets/_probe/EZO_CO2_Datasheet.pdf)
-- [flo](https://www.atlas-scientific.com/_files/_datasheets/_circuit/flow_EZO_Datasheet.pdf)
+- [pH](https://www.atlas-scientific.com/files/pH_EZO_Datasheet.pdf)
+- [temp](https://www.atlas-scientific.com/files/EZO_RTD_Datasheet.pdf)
+- [orp](https://www.atlas-scientific.com/files/ORP_EZO_Datasheet.pdf)
+- [do](https://www.atlas-scientific.com/files/DO_EZO_Datasheet.pdf)
+- [ec](https://www.atlas-scientific.com/files/EC_EZO_Datasheet.pdf)
+- [co2](https://www.atlas-scientific.com/files/EZO_CO2_Datasheet.pdf)
+- [flo](https://www.atlas-scientific.com/files/flow_EZO_Datasheet.pdf)
