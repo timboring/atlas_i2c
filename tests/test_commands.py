@@ -15,6 +15,23 @@ class TestBaudCommand:
         with pytest.raises(commands.ArgumentError):
             commands.Baud.format_command(arg)
 
+
+class TestCalibrateDoCommand:
+    @pytest.mark.parametrize("arg", [0, "clear", "?", None])
+    def test_format_command(self, arg):
+        cal = commands.CalibrateDo
+        cmd = cal.format_command(arg)
+        if arg:
+            assert cmd == f"{cal.name},{arg}"
+        else:
+            assert cmd == f"{cal.name}"
+
+    @pytest.mark.parametrize("arg", ["delete", "foo"])
+    def test_format_command_with_invalid_arg(self, arg):
+        with pytest.raises(commands.ArgumentError):
+            commands.CalibrateDo.format_command(arg)
+
+
 class TestCalibratePhCommand:
     @pytest.mark.parametrize("arg", ["mid", "low", "high"])
     def test_format_command(self, arg):

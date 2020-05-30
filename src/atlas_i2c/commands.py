@@ -63,6 +63,24 @@ class Calibrate(Command):
         raise NotImplementedError
 
 
+class CalibrateDo(Command):
+    """Calibrate dissolved oxygen sensor."""
+
+    arguments: Tuple[int, str, str] = (0, "clear", "?")
+    name: str = "Cal"
+    processing_delay: int = 1300
+
+    @classmethod
+    def format_command(cls, arg: Optional[str] = None) -> str:
+        if arg and arg not in cls.arguments:
+            raise ArgumentError(f"{arg} must be one of {cls.arguments} or None")
+
+        cmd = f"{cls.name}"
+        if arg:
+            cmd = ",".join([cmd, arg])
+        return cmd
+
+
 class CalibratePh(Command):
     """Calibrate pH sensor."""
 
