@@ -15,6 +15,24 @@ class TestBaudCommand:
         with pytest.raises(commands.ArgumentError):
             commands.Baud.format_command(arg)
 
+class TestCalibratePhCommand:
+    @pytest.mark.parametrize("arg", ["mid", "low", "high"])
+    def test_format_command(self, arg):
+        cal = commands.CalibratePh
+        cmd = cal.format_command(arg)
+        assert cmd == f"{cal.name},{arg},{commands.CalibratePh.calibration_points[arg]}"
+
+    @pytest.mark.parametrize("arg", ["clear", "?"])
+    def test_format_command_with_clear_and_status(self, arg):
+        cal = commands.CalibratePh
+        cmd = cal.format_command(arg)
+        assert cmd == f"{cal.name},{arg}"
+
+    @pytest.mark.parametrize("arg", ["delete", "foo"])
+    def test_format_command_with_invalid_arg(self, arg):
+        with pytest.raises(commands.ArgumentError):
+            commands.CalibratePh.format_command(arg)
+
 
 class TestDataLoggerCommand:
     @pytest.mark.parametrize("arg", [0, 10, 5000, 32000, "?"])

@@ -63,6 +63,30 @@ class Calibrate(Command):
         raise NotImplementedError
 
 
+class CalibratePh(Command):
+    """Calibrate pH sensor."""
+
+    arguments: Tuple[str, str, str, str, str] = ("mid", "low", "high", "clear", "?")
+    name: str = "Cal"
+    processing_delay: int = 900
+
+    calibration_points = {"mid": 7.00, "low": 4.00, "high": 10.00}
+
+    @classmethod
+    def format_command(cls, arg: str = "?") -> str:
+        if arg not in cls.arguments:
+            raise ArgumentError(f"{arg} must be one of {cls.arguments}")
+
+        cmd = f"{cls.name}"
+
+        if arg in ("mid", "low", "high"):
+            cmd = ",".join([cmd, arg, str(cls.calibration_points[arg])])
+        else:
+            cmd = ",".join([cmd, arg])
+
+        return cmd
+
+
 class DataLogger(Command):
     """Enable/disable data logger."""
 
