@@ -1,5 +1,5 @@
 from abc import ABC, abstractclassmethod
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple, Union
 
 
 class Error(Exception):
@@ -88,7 +88,7 @@ class CalibratePh(Command):
     name: str = "Cal"
     processing_delay: int = 900
 
-    calibration_points = {"mid": 7.00, "low": 4.00, "high": 10.00}
+    calibration_points: Dict[str, float] = {"mid": 7.00, "low": 4.00, "high": 10.00}
 
     @classmethod
     def format_command(cls, arg: str = "?") -> str:
